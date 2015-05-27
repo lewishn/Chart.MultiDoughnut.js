@@ -4,11 +4,20 @@
 		<title>MultiDoughnut Chart</title>
 		<script src="http://www.chartjs.org/assets/Chart.min.js"></script>
 		<script src="../src/Chart.MultiDoughnut.js"></script>
+		<style>
+			div {
+				text-align: center;
+			}
+		</style>
 	</head>
 	<body>
-		<div id="canvas-holder" style="text-align: center">
+		<div>
 			<canvas id="doughnut" height="400px" width="500px"></canvas>
 			<canvas id="pie" height="400px" width="500px"></canvas>
+		</div>
+		<div>
+			<canvas id="doughnut-gap" height="400px" width="500px"></canvas>
+			<canvas id="pie-gap" height="400px" width="500px"></canvas>
 		</div>
 
 		<script>
@@ -66,15 +75,29 @@
 
 				window.onload = function(){
 					var ctx = document.getElementById("doughnut").getContext("2d"),
-						ctxPie = document.getElementById("pie").getContext("2d")
+						ctxPie = document.getElementById("pie").getContext("2d"),
+						ctxGap = document.getElementById("doughnut-gap").getContext("2d"),
+						ctxPieGap = document.getElementById("pie-gap").getContext("2d");
 					
 					window.myDoughnut = new Chart(ctx).MultiDoughnut(datasets, {
-						responsive: false
+						responsive: false,
 					});
 
 					window.myDoughnut = new Chart(ctxPie).MultiDoughnut(datasets, {
 						responsive : false,
-						percentageInnerCutout: 0
+						percentageInnerCutout: 0,
+					});
+
+					window.myDoughnut = new Chart(ctxGap).MultiDoughnut(datasets, {
+						responsive: false,
+						percentageInnerCutout: 20,
+						percentageDatasetGap : 50
+					});
+
+					window.myDoughnut = new Chart(ctxPieGap).MultiDoughnut(datasets, {
+						responsive : false,
+						percentageInnerCutout: 0,
+						percentageDatasetGap : 50
 					});
 				};
 		</script>
