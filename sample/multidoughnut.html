@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+	<head>
+		<title>MultiDoughnut Chart</title>
+		<script src="http://www.chartjs.org/assets/Chart.min.js"></script>
+		<script src="../src/Chart.MultiDoughnut.js"></script>
+	</head>
+	<body>
+		<div id="canvas-holder" style="text-align: center">
+			<canvas id="doughnut" height="400px" width="500px"></canvas>
+			<canvas id="pie" height="400px" width="500px"></canvas>
+		</div>
+
+		<script>
+			var randomScalingFactor = function(){ return Math.round(Math.random()*100)};
+			var datasets = [
+					[
+						{
+							value: randomScalingFactor(),
+							color: "#FDB45C",
+							highlight: "#FFC870",
+							label: "Orange"
+						},
+						{
+							value: randomScalingFactor(),
+							color: "#46BFBD",
+							highlight: "#5AD3D1",
+							label: "Cyan"
+						}
+					],
+					[
+						{
+							value: randomScalingFactor(),
+							color: "#1E61D9",
+							highlight: "#1E77D9",
+							label: "Blue"
+						},
+						{
+							value: randomScalingFactor(),
+							color: "#FFF36A",
+							highlight: "#FFF38A",
+							label: "Yellow"
+						}
+					],
+					[
+						{
+							value: randomScalingFactor(),
+							color: "#6E4FBF",
+							highlight: "#7D5CBF",
+							label: "Purple"
+						},
+						{
+							value: randomScalingFactor(),
+							color:"#F7464A",
+							highlight: "#FF5A5E",
+							label: "Red"
+						},
+						{
+							value: randomScalingFactor(),
+							color:"#2ABF75",
+							highlight: "#41D97B",
+							label: "Green"
+						}
+					]
+				];
+
+				window.onload = function(){
+					var ctx = document.getElementById("doughnut").getContext("2d"),
+						ctxPie = document.getElementById("pie").getContext("2d")
+					
+					window.myDoughnut = new Chart(ctx).MultiDoughnut(datasets, {
+						responsive: false
+					});
+
+					window.myDoughnut = new Chart(ctxPie).MultiDoughnut(datasets, {
+						responsive : false,
+						percentageInnerCutout: 0
+					});
+				};
+		</script>
+	</body>
+</html>
+
+
