@@ -16,6 +16,9 @@
 		//Number - The width of each segment stroke
 		segmentStrokeWidth : 2,
 
+		//Number - The gap between each ring, as a percentage of the width of each ring
+		percentageDatasetGap : 0,
+
 		//The percentage of the chart that we cut out of the middle.
 		percentageInnerCutout : 50,
 
@@ -48,8 +51,23 @@
 			//Declare datasets as a static property to prevent inheriting across the Chart type prototype
 			this.datasets = [];
 			this.outerRadius = (helpers.min([this.chart.width,this.chart.height]) -	this.options.segmentStrokeWidth/2)/2;
+			this.totalGap = function() {
+				return (this.datasets.length - 1) * (this.options.percentageDatasetGap / 100);
+			}
+			this.chartGap = function(index) {
+				return index * (this.outerWidth() - this.segmentWidth() * this.datasets.length) / (this.datasets.length - 1);
+			}
+			this.outerWidth = function() {
+				return this.outerRadius * (1 - this.options.percentageInnerCutout/100);
+			}
 			this.segmentWidth = function() {
-				return this.outerRadius * (1 - this.options.percentageInnerCutout/100) / this.datasets.length;
+				return this.outerWidth() / (this.datasets.length + this.totalGap());
+			}
+			this.calculateOuterRadius = function(datasetIndex) {
+				return (this.outerRadius * this.options.percentageInnerCutout/100) + ((datasetIndex + 1) * this.segmentWidth()) + this.chartGap(datasetIndex);
+			}
+			this.calculateInnerRadius = function(datasetIndex) {
+				return (this.outerRadius * this.options.percentageInnerCutout/100) + ((datasetIndex) * this.segmentWidth()) + this.chartGap(datasetIndex);
 			}
 
 			this.SegmentArc = Chart.Arc.extend({
@@ -226,11 +244,11 @@
 			});
 			this.outerRadius = (helpers.min([this.chart.width,this.chart.height]) -	this.options.segmentStrokeWidth/2)/2;
 			
-			helpers.each(this.datasets, function(dataset, index){
+			helpers.each(this.datasets, function(dataset, datasetIndex){
 				helpers.each(dataset, function(segment){
 					segment.update({
-						outerRadius : (this.outerRadius * this.options.percentageInnerCutout/100) + ((datasetIndex + 1) * this.segmentWidth()),
-						innerRadius : (this.outerRadius * this.options.percentageInnerCutout/100) + (datasetIndex * this.segmentWidth())
+						outerRadius : this.calculateOuterRadius(datasetIndex),
+						innerRadius : this.calculateInnerRadius(datasetIndex)
 					});
 				}, this);
 			}, this);
@@ -240,11 +258,11 @@
 			this.clear();
 
 			helpers.each(this.datasets, function(dataset, datasetIndex){
-				helpers.each(dataset, function(segment, index){
+				helpers.each(dataset, function(segment, index){ 
 					segment.transition({
 						circumference : this.calculateCircumference(segment.value, datasetIndex),
-						outerRadius : (this.outerRadius * this.options.percentageInnerCutout/100) + ((datasetIndex + 1) * this.segmentWidth()),
-						innerRadius : (this.outerRadius * this.options.percentageInnerCutout/100) + (datasetIndex * this.segmentWidth())
+						outerRadius : this.calculateOuterRadius(datasetIndex),
+						innerRadius : this.calculateInnerRadius(datasetIndex)
 					},animDecimal);
 
 					segment.endAngle = segment.startAngle + segment.circumference;
