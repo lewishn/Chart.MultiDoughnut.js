@@ -102,6 +102,59 @@
 			},this);
 			return segmentsArray;
 		},
+		showTooltip : function(ChartElements, forceRedraw){
+			// Only redraw the chart if we've actually changed what we're hovering on.
+			if (typeof this.activeElements === 'undefined') this.activeElements = [];
+
+			var isChanged = (function(Elements){
+				var changed = false;
+
+				if (Elements.length !== this.activeElements.length){
+					changed = true;
+					return changed;
+				}
+
+				helpers.each(Elements, function(element, index){
+					if (element !== this.activeElements[index]){
+						changed = true;
+					}
+				}, this);
+				return changed;
+			}).call(this, ChartElements);
+
+			if (!isChanged && !forceRedraw){
+				return;
+			}
+			else{
+				this.activeElements = ChartElements;
+			}
+			this.draw();
+			if(this.options.customTooltips){
+				this.options.customTooltips(false);
+			}
+			if (ChartElements.length > 0){
+				helpers.each(ChartElements, function(Element) {
+					var tooltipPosition = Element.tooltipPosition();
+					new Chart.Tooltip({
+						x: Math.round(tooltipPosition.x),
+						y: Math.round(tooltipPosition.y),
+						xPadding: this.options.tooltipXPadding,
+						yPadding: this.options.tooltipYPadding,
+						fillColor: this.options.tooltipFillColor,
+						textColor: this.options.tooltipFontColor,
+						fontFamily: this.options.tooltipFontFamily,
+						fontStyle: this.options.tooltipFontStyle,
+						fontSize: this.options.tooltipFontSize,
+						caretHeight: this.options.tooltipCaretSize,
+						cornerRadius: this.options.tooltipCornerRadius,
+						text: helpers.template(this.options.tooltipTemplate, Element),
+						chart: this.chart,
+						custom: this.options.customTooltips
+					}).draw();
+				}, this);
+			}
+			return this;
+		},
 		addData : function(segment, datasetIndex, atIndex, silent) {
 			if (datasetIndex >= this.datasets.length) {
 				this.datasets.splice(datasetIndex, 0, []);
